@@ -1,4 +1,4 @@
-package DB;
+package db;
 
 public abstract class ConnectionConst {
     public static final String URL = "jdbc:mysql://localhost:3306/cellsell";
