@@ -1,7 +1,7 @@
 package swing;
 
 import dao.RegisterDao;
-import dao.login.LoginDao;
+import dao.LoginDao;
 
 import javax.swing.*;
 import java.awt.*;
@@ -56,17 +56,19 @@ public class RegisterPage {
                 return;
             }
 
-            boolean exists = LoginDao.findUserByEmailAndPhone(userType, email, phone);
+            boolean exists = LoginDao.findUser(userType, email, phone);
             if (!exists) {
                 JOptionPane.showMessageDialog(loginFrame, "계정이 없습니다. 가입하세요.", "로그인 실패", JOptionPane.WARNING_MESSAGE);
-                openRegisterWindow(null); // 회원가입 창 열기
+//                openRegisterWindow(null); // 회원가입 창 자동 열기
             } else {
                 JOptionPane.showMessageDialog(loginFrame, "로그인 성공", "성공", JOptionPane.INFORMATION_MESSAGE);
                 loginFrame.dispose();
                 if (userType.equals("customer")) {
-                    CustomerDashboard.openUserDashboard(email);
+                    int custId = LoginDao.getCustomerIdByEmail(email);
+                    CustomerDashboard.openUserDashboard(custId);
                 } else {
-                    SellerDashboard.openSellerDashboard(email);
+                    int sellerId = LoginDao.getSellerIdByEmail(email);
+                    SellerDashboard.openSellerDashboard(sellerId);
                 }
             }
         });
@@ -113,26 +115,30 @@ public class RegisterPage {
                 return;
             }
 
-            int userId = -1;
+            int custId = -1;
+            int sellerId = -1;
             if (role.equals("사용자")) {
-                userId = RegisterDao.rgCustomer(name, email, phone);
+                custId = RegisterDao.rgCustomer(name, email, phone);
             } else {
-                userId = RegisterDao.rgSeller(name, email, phone);
+                sellerId = RegisterDao.rgSeller(name, email, phone);
             }
 
-            if (userId != -1) {
-                JOptionPane.showMessageDialog(registerFrame, "회원가입 성공! 자동 로그인됩니다.", "가입 완료", JOptionPane.INFORMATION_MESSAGE);
+            if (custId != -1 || sellerId !=-1) {
+                JOptionPane.showMessageDialog(registerFrame, "회원가입 성공!", "가입 완료", JOptionPane.INFORMATION_MESSAGE);
                 registerFrame.dispose();
 
                 // 자동 로그인 후 대시보드로 이동
                 if (role.equals("사용자")) {
-                    CustomerDashboard.openUserDashboard(email);
+                    CustomerDashboard.openUserDashboard(custId);
                 } else {
-                    SellerDashboard.openSellerDashboard(email);
+                    SellerDashboard.openSellerDashboard(sellerId);
                 }
             } else {
-                JOptionPane.showMessageDialog(registerFrame, "회원가입 실패. 다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(registerFrame, "이미 가입된 이메일입니다.", "오류", JOptionPane.ERROR_MESSAGE);
             }
         });
     }
 }
+//사용자 - 휴대폰 고르기 - 선택칸 삭제, 맨 아래 선택을 더 크게 - 판매자가 취소했을 때, 재신청 버튼 하나 더,
+// - 휴대폰 신청한 날짜
+//판매자 - 휴대폰 상태 변경 버튼(맨 아래) 더 크게 - 취소 사유 작성칸

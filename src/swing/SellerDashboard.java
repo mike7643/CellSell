@@ -1,4 +1,3 @@
-
 package swing;
 
 import dao.SellerDao;
@@ -12,32 +11,28 @@ import java.time.format.DateTimeParseException;
 import java.util.List;
 
 public class SellerDashboard {
-    public static void openSellerDashboard(String email) {
+    public static void openSellerDashboard(int sellerId) {
         JFrame frame = new JFrame("판매자 대시보드");
-        frame.setSize(500, 400);
-        frame.setLayout(new BorderLayout(10, 10));
+        frame.setSize(400, 400);
+        frame.setLayout(new GridLayout(3, 1, 10, 10));
 
-        JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         JButton viewMyPhonesButton = new JButton("내 휴대폰 보기");
         JButton manageOrdersButton = new JButton("주문 관리");
         JButton sellPhoneButton = new JButton("휴대폰 판매");
 
-        buttonPanel.add(viewMyPhonesButton);
-        buttonPanel.add(manageOrdersButton);
-        buttonPanel.add(sellPhoneButton);
+        frame.add(viewMyPhonesButton);
+        frame.add(manageOrdersButton);
+        frame.add(sellPhoneButton);
 
-        frame.add(buttonPanel, BorderLayout.CENTER);
         frame.setVisible(true);
 
-        viewMyPhonesButton.addActionListener(e -> viewMyPhonesTable(email));
-        manageOrdersButton.addActionListener(e -> managePendingOrders(email));
-        sellPhoneButton.addActionListener(e -> sellPhone(email));
+        viewMyPhonesButton.addActionListener(e -> viewMyPhonesTable(sellerId));
+        manageOrdersButton.addActionListener(e -> managePendingOrders(sellerId));
+        sellPhoneButton.addActionListener(e -> sellPhone(sellerId));
     }
 
     // ✅ 🔹 판매자가 직접 휴대폰 정보를 입력하여 판매 목록에 추가
-    private static void sellPhone(String sellerEmail) {
-        int sellerId = SellerDao.getSellerIdByEmail(sellerEmail);
-
+    private static void sellPhone(int sellerId) {
         JFrame frame = new JFrame("휴대폰 판매");
         frame.setSize(400, 350);
         frame.setLayout(new BorderLayout(10, 10));
@@ -102,7 +97,7 @@ public class SellerDashboard {
 
                 LocalDate releaseDate = LocalDate.parse(releaseDateField.getText().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
 
-                boolean success = SellerDao.addNewPhoneToSalesList(model, brand, price, specs, releaseDate, sellerId, quantity);
+                boolean success = SellerDao.addNewPhone(model, brand, price, specs, releaseDate, sellerId, quantity);
                 if (success) {
                     JOptionPane.showMessageDialog(frame, "판매 목록에 추가되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
                     frame.dispose();
@@ -118,8 +113,8 @@ public class SellerDashboard {
     }
 
     // ✅ 🔹 판매자가 등록한 휴대폰을 테이블로 보기
-    private static void viewMyPhonesTable(String sellerEmail) {
-        List<String[]> phoneList = SellerDao.getPhonesBySellerEmail(sellerEmail);
+    private static void viewMyPhonesTable(int sellerId) {
+        List<String[]> phoneList = SellerDao.getPhonesBySellerId(sellerId);
 
         JFrame frame = new JFrame("내 휴대폰 목록");
         frame.setSize(600, 400);
@@ -141,8 +136,7 @@ public class SellerDashboard {
     }
 
     // ✅ 🔹 주문 관리 (주문 상태 표시 + 상태 변경)
-    private static void managePendingOrders(String sellerEmail) {
-        int sellerId = SellerDao.getSellerIdByEmail(sellerEmail);
+    private static void managePendingOrders(int sellerId) {
         List<String[]> orders = SellerDao.getPendingOrdersForSeller(sellerId);
 
         JFrame frame = new JFrame("주문 관리");

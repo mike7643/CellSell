@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SellerDao {
-    // 🔹 판매자가 새로운 휴대폰을 등록하고 판매 목록에 추가
-    public static boolean addNewPhoneToSalesList(String model, String brand, int price, String spec, LocalDate releasedAt, int sellerId, int quantity) {
+    // 판매자가 새로운 휴대폰을 등록하고 판매 목록에 추가
+    public static boolean addNewPhone(String model, String brand, int price, String spec, LocalDate releasedAt, int sellerId, int quantity) {
         Connection con = null;
         PreparedStatement pstmt = null;
         PreparedStatement stockPstmt = null;
@@ -29,19 +29,19 @@ public class SellerDao {
             pstmt.executeUpdate();
 
             rs = pstmt.getGeneratedKeys();
+
             int phoneId = -1;
+
             if (rs.next()) {
                 phoneId = rs.getInt(1);
             }
+            stockPstmt = con.prepareStatement(stockSql);
+            stockPstmt.setInt(1, phoneId);
+            stockPstmt.setInt(2, sellerId);
+            stockPstmt.setInt(3, quantity);
+            int rowsAffected = stockPstmt.executeUpdate();
+            return rowsAffected > 0;
 
-            if (phoneId != -1) {
-                stockPstmt = con.prepareStatement(stockSql);
-                stockPstmt.setInt(1, phoneId);
-                stockPstmt.setInt(2, sellerId);
-                stockPstmt.setInt(3, quantity);
-                int rowsAffected = stockPstmt.executeUpdate();
-                return rowsAffected > 0;
-            }
         } catch (SQLException e) {
             e.printStackTrace();
         } finally {
@@ -50,8 +50,10 @@ public class SellerDao {
         }
         return false;
     }
-    // 🔹 판매자가 등록한 휴대폰 판매 목록 조회
-    public static List<String[]> getSellerSalesList(int sellerId) {
+
+
+    // 판매자가 등록한 휴대폰 판매 목록 조회
+    public static List<String[]> getPhonesBySellerId(int sellerId) {
         Connection con = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -85,7 +87,7 @@ public class SellerDao {
         return salesList;
     }
 
-    // 🔹 판매자가 새로운 휴대폰을 판매 목록에 추가
+    // 판매자가 새로운 휴대폰을 판매 목록에 추가
     public static boolean addPhoneToSalesList(int sellerId, int phoneId, int quantity) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -109,7 +111,7 @@ public class SellerDao {
             DBUtil.releaseConnection(pstmt, con);
         }
     }
-    // 🔹 판매자 ID 조회 (이메일 기반)
+    // 판매자 ID 조회 (이메일 기반)
     public static int getSellerIdByEmail(String email) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -133,7 +135,7 @@ public class SellerDao {
         return sellerId;
     }
 
-    // 🔹 특정 휴대폰을 판매한 판매자 ID 조회
+    // 특정 휴대폰을 판매한 판매자 ID 조회
     public static int getSellerIdByPhoneId(int phoneId) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -157,7 +159,7 @@ public class SellerDao {
         return sellerId;
     }
 
-    // 🔹 특정 판매자가 등록한 휴대폰 목록 조회 (테이블 형태)
+    // 특정 판매자가 등록한 휴대폰 목록 조회 (테이블 형태)
     public static List<String[]> getPhonesBySellerEmail(String sellerEmail) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -192,7 +194,7 @@ public class SellerDao {
         return phoneList;
     }
 
-    // 🔹 판매자의 `pending` 상태 주문 목록 조회 (현재 상태 포함)
+    // 판매자의 pending 상태 주문 목록 조회 (현재 상태 포함)
     public static List<String[]> getPendingOrdersForSeller(int sellerId) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -218,7 +220,7 @@ public class SellerDao {
                         rs.getString("model"),
                         rs.getString("brand"),
                         String.valueOf(rs.getInt("price")),
-                        rs.getString("order_status") // 🔹 현재 상태 추가
+                        rs.getString("order_status")
                 });
             }
         } catch (SQLException e) {
@@ -229,7 +231,7 @@ public class SellerDao {
         return orderList;
     }
 
-    // 🔹 주문 상태 업데이트
+    // 주문 상태 업데이트
     public static boolean updateOrderStatus(int orderId, String newStatus) {
         Connection con = null;
         PreparedStatement pstmt = null;

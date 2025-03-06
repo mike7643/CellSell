@@ -10,7 +10,7 @@ import java.awt.*;
 import java.util.List;
 
 class CustomerDashboard {
-    public static void openUserDashboard(String email) {
+    public static void openUserDashboard(int custId) {
         JFrame frame = new JFrame("사용자 대시보드");
         frame.setSize(400, 300);
         frame.setLayout(new GridLayout(2, 1, 10, 10));
@@ -23,17 +23,17 @@ class CustomerDashboard {
 
         frame.setVisible(true);
 
-        requestListButton.addActionListener(e -> viewRequestedPhones(email));
-        browsePhonesButton.addActionListener(e -> browsePhones(email));
+        requestListButton.addActionListener(e -> viewRequestedPhones(custId));
+        browsePhonesButton.addActionListener(e -> browsePhones(custId));
     }
 
-    private static void viewRequestedPhones(String email) {
-        String phones = OrdersDao.getRequestedPhonesByEmail(email);
+    private static void viewRequestedPhones(int custId) {
+        String phones = OrdersDao.getRequestedPhones(custId);
         JOptionPane.showMessageDialog(null, phones.isEmpty() ? "신청한 휴대폰이 없습니다." : phones, "신청 목록", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private static void browsePhones(String customerEmail) {
-        List<String[]> phoneList = PhoneDao.getAllPhonesWithSeller();
+    private static void browsePhones(int custId) {
+        List<String[]> phoneList = PhoneDao.getAllPhones();
 
         if (phoneList.isEmpty()) {
             JOptionPane.showMessageDialog(null, "등록된 휴대폰이 없습니다.", "알림", JOptionPane.INFORMATION_MESSAGE);
@@ -48,7 +48,7 @@ class CustomerDashboard {
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         for (String[] phone : phoneList) {
-            model.addRow(new Object[]{phone[0], phone[1], phone[2], phone[3], phone[4], phone[5], "선택"});
+            model.addRow(new Object[]{phone[0], phone[1], phone[2], phone[3], phone[4], phone[5]});
         }
 
         JTable table = new JTable(model);
@@ -78,7 +78,7 @@ class CustomerDashboard {
                 String selectedPrice = table.getValueAt(selectedRow, 3).toString();
                 String selectedSellerName = table.getValueAt(selectedRow, 5).toString();
 
-                // 🔹 판매자 ID 조회
+                // 판매자 ID 조회
                 int sellerId = SellerDao.getSellerIdByPhoneId(phoneId);
 
                 int confirm = JOptionPane.showConfirmDialog(browseFrame,
@@ -87,7 +87,7 @@ class CustomerDashboard {
                         JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {
-                    boolean success = OrdersDao.purchasePhone(customerEmail, phoneId, sellerId);
+                    boolean success = OrdersDao.orderPhone(custId, phoneId, sellerId);
                     if (success) {
                         JOptionPane.showMessageDialog(browseFrame, "구매가 완료되었습니다!", "구매 완료", JOptionPane.INFORMATION_MESSAGE);
                     } else {
