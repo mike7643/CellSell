@@ -44,7 +44,7 @@ class CustomerDashboard {
         browseFrame.setSize(700, 400);
         browseFrame.setLayout(new BorderLayout());
 
-        String[] columnNames = {"ID", "모델", "브랜드", "가격", "출시일", "판매자", "선택"};
+        String[] columnNames = {"ID", "모델", "브랜드", "가격", "출시일", "판매자"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         for (String[] phone : phoneList) {
@@ -59,8 +59,13 @@ class CustomerDashboard {
         JScrollPane scrollPane = new JScrollPane(table);
         browseFrame.add(scrollPane, BorderLayout.CENTER);
 
-        JButton purchaseButton = new JButton("구매하기");
-        browseFrame.add(purchaseButton, BorderLayout.SOUTH);
+        JButton purchaseButton = new JButton("주문 신청하기");
+        purchaseButton.setPreferredSize(new Dimension(200, 50));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(purchaseButton);
+
+        browseFrame.add(buttonPanel, BorderLayout.SOUTH);
 
         browseFrame.setVisible(true);
 

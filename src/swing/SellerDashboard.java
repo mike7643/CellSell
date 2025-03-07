@@ -31,7 +31,7 @@ public class SellerDashboard {
         sellPhoneButton.addActionListener(e -> sellPhone(sellerId));
     }
 
-    // ✅ 🔹 판매자가 직접 휴대폰 정보를 입력하여 판매 목록에 추가
+    // 판매자가 직접 휴대폰 정보를 입력하여 판매 목록에 추가
     private static void sellPhone(int sellerId) {
         JFrame frame = new JFrame("휴대폰 판매");
         frame.setSize(400, 350);
@@ -59,7 +59,7 @@ public class SellerDashboard {
         // 버튼
         JButton addButton = new JButton("추가하기");
 
-        // 🔹 GridBagLayout으로 정렬
+        // GridBagLayout으로 정렬
         gbc.gridx = 0; gbc.gridy = 0; panel.add(modelLabel, gbc);
         gbc.gridx = 1; gbc.gridy = 0; panel.add(modelField, gbc);
         gbc.gridx = 0; gbc.gridy = 1; panel.add(brandLabel, gbc);
@@ -112,7 +112,7 @@ public class SellerDashboard {
         });
     }
 
-    // ✅ 🔹 판매자가 등록한 휴대폰을 테이블로 보기
+    // 판매자가 등록한 휴대폰을 테이블로 보기
     private static void viewMyPhonesTable(int sellerId) {
         List<String[]> phoneList = SellerDao.getPhonesBySellerId(sellerId);
 
@@ -135,7 +135,7 @@ public class SellerDashboard {
         frame.setVisible(true);
     }
 
-    // ✅ 🔹 주문 관리 (주문 상태 표시 + 상태 변경)
+    // 주문 관리 (주문 상태 표시 + 상태 변경)
     private static void managePendingOrders(int sellerId) {
         List<String[]> orders = SellerDao.getPendingOrdersForSeller(sellerId);
 
@@ -143,7 +143,7 @@ public class SellerDashboard {
         frame.setSize(750, 400);
         frame.setLayout(new BorderLayout());
 
-        // ✅ 테이블 컬럼 (현재 상태 포함)
+        // 테이블 컬럼 (현재 상태 포함)
         String[] columnNames = {"주문 ID", "고객 이름", "이메일", "모델", "브랜드", "가격", "현재 상태"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
