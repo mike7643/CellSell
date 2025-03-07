@@ -47,7 +47,7 @@ public class CustomerDashboard {
         JScrollPane scrollPane = new JScrollPane(table);
         browseFrame.add(scrollPane, BorderLayout.CENTER);
 
-        // 🔹 검색 패널 (세로 정렬)
+        //검색 패널 세로 정렬
         JPanel searchPanel = new JPanel(new GridBagLayout());
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(5, 5, 5, 5);
@@ -93,7 +93,7 @@ public class CustomerDashboard {
         gbc.gridx = 2;
         searchPanel.add(releaseDateSearchButton, gbc);
 
-        // 🔹 가격 검색 (단일 가격 이하)
+        // 가격 검색 (단일 가격 이하)
         gbc.gridx = 0;
         gbc.gridy++;
         searchPanel.add(new JLabel("가격 (~이하):"), gbc);
@@ -106,7 +106,7 @@ public class CustomerDashboard {
         JButton priceSearchButton = new JButton("검색");
         searchPanel.add(priceSearchButton, gbc);
 
-        // 🔹 전체 목록 보기 버튼
+        // 전체 목록 보기 버튼
         gbc.gridx = 0;
         gbc.gridy++;
         gbc.gridwidth = 3;
@@ -115,7 +115,7 @@ public class CustomerDashboard {
 
         browseFrame.add(searchPanel, BorderLayout.WEST);
 
-        // 🔹 검색 버튼 이벤트 추가
+        // 검색 버튼 이벤트 추가
         modelSearchButton.addActionListener(e -> updatePhoneTable(PhoneDao.searchPhonesByModel(modelField.getText().trim())));
         brandSearchButton.addActionListener(e -> updatePhoneTable(PhoneDao.searchPhonesByBrand(brandField.getText().trim())));
         sellerSearchButton.addActionListener(e -> updatePhoneTable(PhoneDao.searchPhonesBySeller(sellerField.getText().trim())));
@@ -131,7 +131,7 @@ public class CustomerDashboard {
 
         allPhonesButton.addActionListener(e -> updatePhoneTable(PhoneDao.getAllPhones()));
 
-        // 🔹 주문 신청 버튼 추가
+        // 주문 신청 버튼 추가
         JButton purchaseButton = new JButton("주문 신청하기");
         purchaseButton.setPreferredSize(new Dimension(200, 50));
         JPanel buttonPanel = new JPanel();
