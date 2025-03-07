@@ -179,11 +179,6 @@ public class SellerDashboard {
                 if (newStatus.equals("거절")) {
                     canceledReason = JOptionPane.showInputDialog(frame, "거절 사유를 입력하세요:", "거절 사유 입력",
                             JOptionPane.QUESTION_MESSAGE);
-
-                    if (canceledReason == null || canceledReason.trim().isEmpty()) {
-                        JOptionPane.showMessageDialog(frame, "거절 사유를 입력해야 합니다.", "입력 오류", JOptionPane.WARNING_MESSAGE);
-                        return;
-                    }
                 }
 
                 boolean success = SellerDao.updateOrderStatus(orderId, newStatus, canceledReason);

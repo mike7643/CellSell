@@ -30,7 +30,7 @@ public class OrdersDao {
                 requestedPhones
                         .append("["+rs.getDate("order_date")+"] ")
                         .append(rs.getString("brand")).append(" ")
-                        .append(rs.getString("model")).append(" - ")
+                        .append(rs.getString("model")).append(" / 가격: ")
                         .append(rs.getInt("price")).append("원 / (판매자 승인여부: ").append(oStatus+")\n");
                 if(oStatus.equals("거절")) {
                     requestedPhones.append("[거절 사유 : " + reasonWhyCanceled(orderId) + "]\n\n");
@@ -60,7 +60,7 @@ public class OrdersDao {
 
              if (rs.next()) {
                 String reason = rs.getString("canceled_reason");
-                if (reason != null) {
+                if (reason != null && !reason.isEmpty()) {
                     return reason;
                 }else return "판매자가 거절 사유를 작성하지 않았습니다. 문의 바랍니다.";
             } return "해당 주문은 취소되지 않았습니다!";
