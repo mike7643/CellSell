@@ -16,6 +16,62 @@ import java.util.List;
 
 public class SellerDao {
 
+    public static boolean deletePhone(int phoneId) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        String sql = "DELETE FROM phone WHERE phone_id = ?";
+
+        try {
+            con = DBUtil.getConnection();
+            pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, phoneId);
+            int affectedRows = pstmt.executeUpdate();
+            return affectedRows > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
+            return false;
+        } finally {
+            DBUtil.releaseConnection(pstmt, con);
+        }
+    }
+
+    public static boolean updatePhone(int phoneId, String model, String brand, int price, String specs, LocalDate releaseDate) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        String phoneSql = "UPDATE phone SET model = ?, brand = ?, price = ?, spec = ?, released_at = ? WHERE phone_id = ?";
+
+        try {
+            con = DBUtil.getConnection();
+            con.setAutoCommit(false);
+
+            pstmt = con.prepareStatement(phoneSql);
+            pstmt.setString(1, model);
+            pstmt.setString(2, brand);
+            pstmt.setInt(3, price);
+            pstmt.setString(4, specs);
+            pstmt.setDate(5, Date.valueOf(releaseDate));
+            pstmt.setInt(6, phoneId);
+            pstmt.executeUpdate();
+
+            con.commit();
+            return true;
+        } catch (SQLException e) {
+            try {
+                if (con != null) {
+                    con.rollback();
+                }
+            } catch (SQLException rollbackEx) {
+                rollbackEx.printStackTrace();
+            }
+            e.printStackTrace();
+            return false;
+        } finally {
+            DBUtil.releaseConnection(pstmt, con);
+        }
+    }
+
+
+
     // 판매자 이름을 ID로 가져오기
     public static String getSellerNameById(int sellerId) {
         Connection con = null;

@@ -11,8 +11,6 @@ import java.util.List;
 
 public class AdminDao {
 
-    //가입
-
     // 고객 ID 조회 (이메일 기반)
     public static int getCustomerIdByEmail(String email) {
         Connection con = null;

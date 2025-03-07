@@ -40,7 +40,7 @@ public class SellerDashboard {
         frame.setVisible(true);
 
         viewMyPhonesButton.addActionListener(e -> viewMyPhonesTable(sellerId));
-        manageOrdersButton.addActionListener(e -> manageOrders(sellerId));
+        manageOrdersButton.addActionListener(e -> manageOrderStatus(sellerId));
         sellPhoneButton.addActionListener(e -> sellPhone(sellerId));
     }
 
@@ -124,6 +124,7 @@ public class SellerDashboard {
         });
     }
 
+
     // 판매자가 등록한 휴대폰을 테이블로 보기
     private static void viewMyPhonesTable(int sellerId) {
         List<String[]> phoneList = SellerDao.getPhonesBySellerId(sellerId);
@@ -141,14 +142,120 @@ public class SellerDashboard {
 
         JTable table = new JTable(model);
         table.setRowHeight(30);
-
         JScrollPane scrollPane = new JScrollPane(table);
         frame.add(scrollPane, BorderLayout.CENTER);
+
+        JPanel buttonPanel = new JPanel();
+        JButton deleteButton = new JButton("삭제하기");
+        JButton editButton = new JButton("수정하기");
+        buttonPanel.add(deleteButton);
+        buttonPanel.add(editButton);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+
+        deleteButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(frame, "삭제할 폰을 선택하세요.", "오류", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int phoneId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+            int confirm = JOptionPane.showConfirmDialog(frame, "정말 삭제하시겠습니까?", "확인", JOptionPane.YES_NO_OPTION);
+            if (confirm == JOptionPane.YES_OPTION) {
+                boolean success = SellerDao.deletePhone(phoneId);
+                if (success) {
+                    model.removeRow(selectedRow);
+                    JOptionPane.showMessageDialog(frame, "삭제되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(frame, "삭제 실패. 다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+
+        editButton.addActionListener(e -> {
+            int selectedRow = table.getSelectedRow();
+            if (selectedRow == -1) {
+                JOptionPane.showMessageDialog(frame, "수정할 폰을 선택하세요.", "오류", JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+
+            int phoneId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
+            editPhoneView(phoneId, model, selectedRow);
+        });
+
         frame.setVisible(true);
     }
+    private static void editPhoneView(int phoneId, DefaultTableModel model, int rowIndex) {
+        JFrame frame = new JFrame("휴대폰 정보 수정");
+        frame.setSize(400, 400);
+        frame.setLayout(new BorderLayout(10, 10));
+
+        JPanel panel = new JPanel(new GridBagLayout());
+        GridBagConstraints gbc = new GridBagConstraints();
+        gbc.insets = new Insets(5, 5, 5, 5);
+        gbc.fill = GridBagConstraints.HORIZONTAL;
+
+        JLabel modelLabel = new JLabel("모델:");
+        JTextField modelField = new JTextField(model.getValueAt(rowIndex, 1).toString(), 15);
+        JLabel brandLabel = new JLabel("브랜드:");
+        JTextField brandField = new JTextField(model.getValueAt(rowIndex, 2).toString(), 15);
+        JLabel priceLabel = new JLabel("가격 (만원):");
+        JTextField priceField = new JTextField(model.getValueAt(rowIndex, 3).toString().replace(" 만원", ""), 15);
+        JLabel specsLabel = new JLabel("스펙:");
+        JTextField specsField = new JTextField(15);
+        JLabel releaseDateLabel = new JLabel("출시일 (YYYY-MM-DD):");
+        JTextField releaseDateField = new JTextField(model.getValueAt(rowIndex, 4).toString(), 15);
+
+        JButton updateButton = new JButton("수정 완료");
+
+        gbc.gridx = 0; gbc.gridy = 0; panel.add(modelLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 0; panel.add(modelField, gbc);
+        gbc.gridx = 0; gbc.gridy = 1; panel.add(brandLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 1; panel.add(brandField, gbc);
+        gbc.gridx = 0; gbc.gridy = 2; panel.add(priceLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 2; panel.add(priceField, gbc);
+        gbc.gridx = 0; gbc.gridy = 3; panel.add(specsLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 3; panel.add(specsField, gbc);
+        gbc.gridx = 0; gbc.gridy = 4; panel.add(releaseDateLabel, gbc);
+        gbc.gridx = 1; gbc.gridy = 4; panel.add(releaseDateField, gbc);
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(updateButton);
+        frame.add(panel, BorderLayout.CENTER);
+        frame.add(buttonPanel, BorderLayout.SOUTH);
+        frame.setVisible(true);
+
+        updateButton.addActionListener(e -> {
+            try {
+                String modelName = modelField.getText().trim();
+                String brand = brandField.getText().trim();
+                int price = Integer.parseInt(priceField.getText().trim());
+                String specs = specsField.getText().trim();
+                LocalDate releaseDate = LocalDate.parse(releaseDateField.getText().trim(), DateTimeFormatter.ofPattern("yyyy-MM-dd"));
+
+                boolean success = SellerDao.updatePhone(phoneId, modelName, brand, price, specs, releaseDate);
+                if (success) {
+                    model.setValueAt(modelName, rowIndex, 1);
+                    model.setValueAt(brand, rowIndex, 2);
+                    model.setValueAt(price + " 만원", rowIndex, 3);
+                    model.setValueAt(releaseDate.toString(), rowIndex, 4);
+                    JOptionPane.showMessageDialog(frame, "수정이 완료되었습니다.", "성공", JOptionPane.INFORMATION_MESSAGE);
+                    frame.dispose();
+                } else {
+                    JOptionPane.showMessageDialog(frame, "수정 실패. 다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+                }
+            } catch (NumberFormatException ex) {
+                JOptionPane.showMessageDialog(frame, "가격은 숫자로 입력해야 합니다.", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            } catch (DateTimeParseException ex) {
+                JOptionPane.showMessageDialog(frame, "출시일 형식이 잘못되었습니다. (YYYY-MM-DD 형식)", "입력 오류", JOptionPane.ERROR_MESSAGE);
+            }
+        });
+    }
+
+
 
     // 주문 관리 (주문 상태 표시 + 상태 변경)
-    private static void manageOrders(int sellerId) {
+    private static void manageOrderStatus(int sellerId) {
         List<String[]> orders = SellerDao.getOrdersForSeller(sellerId);
 
         JFrame frame = new JFrame("주문 관리");
