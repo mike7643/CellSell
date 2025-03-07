@@ -58,7 +58,7 @@ public class RegisterPage {
 
             boolean exists = LoginDao.findUser(userType, email, phone);
             if (!exists) {
-                JOptionPane.showMessageDialog(loginFrame, "계정이 없습니다. 가입하세요.", "로그인 실패", JOptionPane.WARNING_MESSAGE);
+                JOptionPane.showMessageDialog(loginFrame, "계정이 없습니다.", "로그인 실패", JOptionPane.WARNING_MESSAGE);
 //                openRegisterWindow(null); // 회원가입 창 자동 열기
             } else {
                 JOptionPane.showMessageDialog(loginFrame, "로그인 성공", "성공", JOptionPane.INFORMATION_MESSAGE);

@@ -44,16 +44,15 @@ class CustomerDashboard {
         browseFrame.setSize(700, 400);
         browseFrame.setLayout(new BorderLayout());
 
-        String[] columnNames = {"ID", "모델", "브랜드", "가격", "출시일", "판매자"};
+        String[] columnNames = {"모델", "브랜드", "가격", "출시일", "판매자"};
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         for (String[] phone : phoneList) {
-            model.addRow(new Object[]{phone[0], phone[1], phone[2], phone[3], phone[4], phone[5]});
+            model.addRow(new Object[]{phone[1], phone[2], phone[3] + " 만원", phone[4], phone[5]});
         }
 
         JTable table = new JTable(model);
         table.setRowHeight(30);
-        table.getColumn("ID").setPreferredWidth(50);
 
         JScrollPane scrollPane = new JScrollPane(table);
         browseFrame.add(scrollPane, BorderLayout.CENTER);
@@ -82,12 +81,11 @@ class CustomerDashboard {
                 String selectedPrice = table.getValueAt(selectedRow, 3).toString();
                 String selectedSellerName = table.getValueAt(selectedRow, 5).toString();
 
-                // 판매자 ID 조회
                 int sellerId = SellerDao.getSellerIdByPhoneId(phoneId);
 
                 int confirm = JOptionPane.showConfirmDialog(browseFrame,
-                        "다음 휴대폰을 신청하시겠습니까?\n\n모델: " + selectedModel + "\n브랜드: " + selectedBrand + "\n가격: $" + selectedPrice + "\n판매자: " + selectedSellerName,
-                        "신청 확인",
+                        "다음 휴대폰을 신청하시겠습니까?\n\n모델: " + selectedModel + "\n브랜드: " + selectedBrand + "\n가격: " + selectedPrice+" 만원" + "\n판매자: " + selectedSellerName,
+                        "신청 최종 확인",
                         JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {

@@ -121,7 +121,7 @@ public class SellerDashboard {
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         for (String[] phone : phoneList) {
-            model.addRow(phone);
+            model.addRow(new String[]{phone[0], phone[1], phone[2], phone[3] + " 만원", phone[4]});
         }
 
         JTable table = new JTable(model);
@@ -145,7 +145,7 @@ public class SellerDashboard {
         DefaultTableModel model = new DefaultTableModel(columnNames, 0);
 
         for (String[] order : orders) {
-            model.addRow(order);
+            model.addRow(new String[]{order[0], order[1], order[2], order[3], order[4], order[5] + " 만원", order[6]});
         }
 
         JTable table = new JTable(model);
@@ -153,8 +153,13 @@ public class SellerDashboard {
         JScrollPane scrollPane = new JScrollPane(table);
         frame.add(scrollPane, BorderLayout.CENTER);
 
-        JButton updateButton = new JButton("상태 변경");
-        frame.add(updateButton, BorderLayout.SOUTH);
+        JButton updateButton = new JButton("상태 변경하기");
+        updateButton.setPreferredSize(new Dimension(200, 50));
+
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.add(updateButton);
+
+        frame.add(buttonPanel, BorderLayout.SOUTH);
 
         updateButton.addActionListener(e -> {
             int selectedRow = table.getSelectedRow();

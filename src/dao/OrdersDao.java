@@ -31,7 +31,7 @@ public class OrdersDao {
                         .append("["+rs.getDate("order_date")+"] ")
                         .append(rs.getString("brand")).append(" ")
                         .append(rs.getString("model")).append(" - ")
-                        .append(rs.getInt("price")).append("원 / (판매자 승인 여부: ").append(oStatus+")\n");
+                        .append(rs.getInt("price")).append("원 / (판매자 승인여부: ").append(oStatus+")\n");
                 if(oStatus.equals("거절")) {
                     requestedPhones.append("[거절 사유 : " + reasonWhyCanceled(orderId) + "]\n\n");
                 }
