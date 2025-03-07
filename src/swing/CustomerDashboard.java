@@ -16,7 +16,7 @@ class CustomerDashboard {
         frame.setLayout(new GridLayout(2, 1, 10, 10));
 
         JButton requestListButton = new JButton("휴대폰 신청 목록");
-        JButton browsePhonesButton = new JButton("휴대폰 구매 하러가기");
+        JButton browsePhonesButton = new JButton("휴대폰 신청하러 가기");
 
         frame.add(requestListButton);
         frame.add(browsePhonesButton);
@@ -24,7 +24,7 @@ class CustomerDashboard {
         frame.setVisible(true);
 
         requestListButton.addActionListener(e -> viewRequestedPhones(custId));
-        browsePhonesButton.addActionListener(e -> browsePhones(custId));
+        browsePhonesButton.addActionListener(e -> viewAllPhones(custId));
     }
 
     private static void viewRequestedPhones(int custId) {
@@ -32,7 +32,7 @@ class CustomerDashboard {
         JOptionPane.showMessageDialog(null, phones.isEmpty() ? "신청한 휴대폰이 없습니다." : phones, "신청 목록", JOptionPane.INFORMATION_MESSAGE);
     }
 
-    private static void browsePhones(int custId) {
+    private static void viewAllPhones(int custId) {
         List<String[]> phoneList = PhoneDao.getAllPhones();
 
         if (phoneList.isEmpty()) {
@@ -54,7 +54,6 @@ class CustomerDashboard {
         JTable table = new JTable(model);
         table.setRowHeight(30);
         table.getColumn("ID").setPreferredWidth(50);
-        table.getColumn("선택").setPreferredWidth(70);
 
         JScrollPane scrollPane = new JScrollPane(table);
         browseFrame.add(scrollPane, BorderLayout.CENTER);
@@ -87,16 +86,16 @@ class CustomerDashboard {
                 int sellerId = SellerDao.getSellerIdByPhoneId(phoneId);
 
                 int confirm = JOptionPane.showConfirmDialog(browseFrame,
-                        "다음 휴대폰을 구매하시겠습니까?\n\n모델: " + selectedModel + "\n브랜드: " + selectedBrand + "\n가격: $" + selectedPrice + "\n판매자: " + selectedSellerName,
-                        "구매 확인",
+                        "다음 휴대폰을 신청하시겠습니까?\n\n모델: " + selectedModel + "\n브랜드: " + selectedBrand + "\n가격: $" + selectedPrice + "\n판매자: " + selectedSellerName,
+                        "신청 확인",
                         JOptionPane.YES_NO_OPTION);
 
                 if (confirm == JOptionPane.YES_OPTION) {
                     boolean success = OrdersDao.orderPhone(custId, phoneId, sellerId);
                     if (success) {
-                        JOptionPane.showMessageDialog(browseFrame, "구매가 완료되었습니다!", "구매 완료", JOptionPane.INFORMATION_MESSAGE);
+                        JOptionPane.showMessageDialog(browseFrame, "신청이 완료되었습니다!", "신청 완료", JOptionPane.INFORMATION_MESSAGE);
                     } else {
-                        JOptionPane.showMessageDialog(browseFrame, "구매 실패. 다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
+                        JOptionPane.showMessageDialog(browseFrame, "신청 실패. 다시 시도하세요.", "오류", JOptionPane.ERROR_MESSAGE);
                     }
                 }
             } catch (NumberFormatException ex) {

@@ -99,7 +99,7 @@ public class RegisterPage {
         registerFrame.add(phoneField);
         registerFrame.add(roleLabel);
         registerFrame.add(roleComboBox);
-        registerFrame.add(new JLabel()); // 빈 공간 추가
+        registerFrame.add(new JLabel());
         registerFrame.add(registerButton);
 
         registerFrame.setVisible(true);

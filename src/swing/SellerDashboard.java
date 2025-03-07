@@ -31,7 +31,6 @@ public class SellerDashboard {
         sellPhoneButton.addActionListener(e -> sellPhone(sellerId));
     }
 
-    // 판매자가 직접 휴대폰 정보를 입력하여 판매 목록에 추가
     private static void sellPhone(int sellerId) {
         JFrame frame = new JFrame("휴대폰 판매");
         frame.setSize(400, 350);
@@ -42,12 +41,12 @@ public class SellerDashboard {
         gbc.insets = new Insets(5, 5, 5, 5);
         gbc.fill = GridBagConstraints.HORIZONTAL;
 
-        // 입력 필드
+
         JLabel modelLabel = new JLabel("모델:");
         JTextField modelField = new JTextField(15);
         JLabel brandLabel = new JLabel("브랜드:");
         JTextField brandField = new JTextField(15);
-        JLabel priceLabel = new JLabel("가격:");
+        JLabel priceLabel = new JLabel("가격 (만원):");
         JTextField priceField = new JTextField(15);
         JLabel specsLabel = new JLabel("스펙:");
         JTextField specsField = new JTextField(15);
@@ -56,10 +55,9 @@ public class SellerDashboard {
         JLabel quantityLabel = new JLabel("판매 수량:");
         JTextField quantityField = new JTextField(15);
 
-        // 버튼
+
         JButton addButton = new JButton("추가하기");
 
-        // GridBagLayout으로 정렬
         gbc.gridx = 0; gbc.gridy = 0; panel.add(modelLabel, gbc);
         gbc.gridx = 1; gbc.gridy = 0; panel.add(modelField, gbc);
         gbc.gridx = 0; gbc.gridy = 1; panel.add(brandLabel, gbc);
@@ -73,11 +71,10 @@ public class SellerDashboard {
         gbc.gridx = 0; gbc.gridy = 5; panel.add(quantityLabel, gbc);
         gbc.gridx = 1; gbc.gridy = 5; panel.add(quantityField, gbc);
 
-        // 버튼 패널
+
         JPanel buttonPanel = new JPanel();
         buttonPanel.add(addButton);
 
-        // 프레임에 패널 추가
         frame.add(panel, BorderLayout.CENTER);
         frame.add(buttonPanel, BorderLayout.SOUTH);
         frame.setVisible(true);
@@ -167,16 +164,32 @@ public class SellerDashboard {
             }
 
             int orderId = Integer.parseInt(table.getValueAt(selectedRow, 0).toString());
-            String[] options = {"completed", "canceled"};
+            String[] options = {"승인", "거절"};
             String newStatus = (String) JOptionPane.showInputDialog(frame, "새 상태 선택:", "상태 변경",
                     JOptionPane.QUESTION_MESSAGE, null, options, options[0]);
 
-            if (newStatus != null && SellerDao.updateOrderStatus(orderId, newStatus)) {
-                table.setValueAt(newStatus, selectedRow, 6);
-                JOptionPane.showMessageDialog(frame, "주문 상태가 변경되었습니다.", "변경 완료", JOptionPane.INFORMATION_MESSAGE);
+            if (newStatus != null) {
+                String canceledReason = null;
+
+                if (newStatus.equals("거절")) {
+                    canceledReason = JOptionPane.showInputDialog(frame, "거절 사유를 입력하세요:", "거절 사유 입력",
+                            JOptionPane.QUESTION_MESSAGE);
+
+                    if (canceledReason == null || canceledReason.trim().isEmpty()) {
+                        JOptionPane.showMessageDialog(frame, "거절 사유를 입력해야 합니다.", "입력 오류", JOptionPane.WARNING_MESSAGE);
+                        return;
+                    }
+                }
+
+                boolean success = SellerDao.updateOrderStatus(orderId, newStatus, canceledReason);
+                if (success) {
+                    table.setValueAt(newStatus, selectedRow, 6);
+                    JOptionPane.showMessageDialog(frame, "주문 상태가 변경되었습니다.", "변경 완료", JOptionPane.INFORMATION_MESSAGE);
+                }
             }
         });
 
         frame.setVisible(true);
     }
+
 }

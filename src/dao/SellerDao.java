@@ -231,17 +231,29 @@ public class SellerDao {
         return orderList;
     }
 
-    // 주문 상태 업데이트
-    public static boolean updateOrderStatus(int orderId, String newStatus) {
+    public static boolean updateOrderStatus(int orderId, String newStatus, String canceledReason) {
         Connection con = null;
         PreparedStatement pstmt = null;
 
-        String sql = "UPDATE orders SET order_status = ? WHERE order_id = ?";
+        String sql;
+        if (newStatus.equals("거절")) {
+            sql = "UPDATE orders SET order_status = ?, canceled_reason = ? WHERE order_id = ?";
+        } else {
+            sql = "UPDATE orders SET order_status = ?, canceled_reason = NULL WHERE order_id = ?";
+        }
+
         try {
             con = DBUtil.getConnection();
             pstmt = con.prepareStatement(sql);
             pstmt.setString(1, newStatus);
-            pstmt.setInt(2, orderId);
+
+            if (newStatus.equals("거절")) {
+                pstmt.setString(2, canceledReason);
+                pstmt.setInt(3, orderId);
+            } else {
+                pstmt.setInt(2, orderId);
+            }
+
             int rowsAffected = pstmt.executeUpdate();
             return rowsAffected > 0;
         } catch (SQLException e) {
@@ -251,4 +263,5 @@ public class SellerDao {
             DBUtil.releaseConnection(pstmt, con);
         }
     }
+
 }
