@@ -1,5 +1,6 @@
 package swing;
 
+import dao.CustomerDao;
 import dao.PhoneDao;
 import dao.OrdersDao;
 import dao.SellerDao;
@@ -14,21 +15,36 @@ public class CustomerDashboard {
     private static DefaultTableModel model;
 
     public static void openUserDashboard(int custId) {
+        String customerName = CustomerDao.getCustomerNameById(custId);
+        String greetingMessage = customerName + " 고객님, 반갑습니다!";
+
         JFrame frame = new JFrame("사용자 대시보드");
         frame.setSize(600, 400);
-        frame.setLayout(new GridLayout(3, 1, 10, 10));
+        frame.setLayout(new BorderLayout(10, 10));
 
+        JLabel greetingLabel = new JLabel(greetingMessage, JLabel.CENTER);
+        greetingLabel.setFont(new Font("Dialog", Font.PLAIN, 20));// 폰트 적용함. 글자 크기 작아서
+
+        greetingLabel.setHorizontalAlignment(JLabel.CENTER);
+        greetingLabel.setVerticalAlignment(JLabel.CENTER);
+        frame.add(greetingLabel, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 1, 10, 10));
         JButton requestListButton = new JButton("휴대폰 신청 목록");
         JButton browsePhonesButton = new JButton("휴대폰 구매 하러가기");
 
-        frame.add(requestListButton);
-        frame.add(browsePhonesButton);
+        buttonPanel.add(requestListButton);
+        buttonPanel.add(browsePhonesButton);
+
+        frame.add(buttonPanel, BorderLayout.CENTER);
 
         frame.setVisible(true);
 
         requestListButton.addActionListener(e -> viewRequestedPhones(custId));
         browsePhonesButton.addActionListener(e -> viewAllPhones(custId));
     }
+
+
 
     private static void viewRequestedPhones(int custId) {
         String phones = OrdersDao.getRequestedPhones(custId);

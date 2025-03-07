@@ -6,7 +6,7 @@ import java.sql.*;
 
 public class OrdersDao {
 
-    // 사용자의 휴대폰 주문 목록 custid로 조회
+    // 사용자의 휴대폰 주문 목록 custid 로 조회
     public static String getRequestedPhones(int custId) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -84,7 +84,7 @@ public class OrdersDao {
         try {
             con = DBUtil.getConnection();
             pstmt = con.prepareStatement(insertOrderSql);
-            pstmt.setInt(1, custId);  //직접 전달된 고객 ID 사용
+            pstmt.setInt(1, custId);
             pstmt.setInt(2, phoneId);
             pstmt.setInt(3, sellerId);
             int rows = pstmt.executeUpdate();

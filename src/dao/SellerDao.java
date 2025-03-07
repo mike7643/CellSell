@@ -7,7 +7,42 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+// 판매자 이름을 ID로 가져오기
+// 판매자가 새로운 휴대폰을 등록하고 판매 목록에 추가
+// 판매자가 등록한 휴대폰 판매 목록 조회
+// 특정 휴대폰을 판매한 판매자 ID 조회
+// 판매자의 주문받은 목록 조회
+// 주문 상태 변경
+
 public class SellerDao {
+
+    // 판매자 이름을 ID로 가져오기
+    public static String getSellerNameById(int sellerId) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        String sellerName = null;
+
+        String sql = "SELECT name FROM seller WHERE seller_id = ?";
+
+        try {
+            con = DBUtil.getConnection();
+            pstmt = con.prepareStatement(sql);
+            pstmt.setInt(1, sellerId);
+            rs = pstmt.executeQuery();
+
+            if (rs.next()) {
+                sellerName = rs.getString("name");
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtil.releaseConnection(rs, pstmt, con);
+        }
+
+        return sellerName;
+    }
+
     // 판매자가 새로운 휴대폰을 등록하고 판매 목록에 추가
     public static boolean addNewPhone(String model, String brand, int price, String spec, LocalDate releasedAt, int sellerId, int quantity) {
         Connection con = null;
@@ -87,54 +122,6 @@ public class SellerDao {
         return salesList;
     }
 
-    // 판매자가 새로운 휴대폰을 판매 목록에 추가
-    public static boolean addPhoneToSalesList(int sellerId, int phoneId, int quantity) {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-
-        String sql = "INSERT INTO stock (phone_id, seller_id, quantity) VALUES (?, ?, ?) " +
-                "ON DUPLICATE KEY UPDATE quantity = quantity + ?";
-
-        try {
-            con = DBUtil.getConnection();
-            pstmt = con.prepareStatement(sql);
-            pstmt.setInt(1, phoneId);
-            pstmt.setInt(2, sellerId);
-            pstmt.setInt(3, quantity);
-            pstmt.setInt(4, quantity); // 기존 데이터가 있으면 수량 증가
-            int rowsAffected = pstmt.executeUpdate();
-            return rowsAffected > 0;
-        } catch (SQLException e) {
-            e.printStackTrace();
-            return false;
-        } finally {
-            DBUtil.releaseConnection(pstmt, con);
-        }
-    }
-    // 판매자 ID 조회 (이메일 기반)
-    public static int getSellerIdByEmail(String email) {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        int sellerId = -1;
-
-        String sql = "SELECT seller_id FROM seller WHERE email = ?";
-        try {
-            con = DBUtil.getConnection();
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, email);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                sellerId = rs.getInt("seller_id");
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DBUtil.releaseConnection(rs, pstmt, con);
-        }
-        return sellerId;
-    }
-
     // 특정 휴대폰을 판매한 판매자 ID 조회
     public static int getSellerIdByPhoneId(int phoneId) {
         Connection con = null;
@@ -159,43 +146,8 @@ public class SellerDao {
         return sellerId;
     }
 
-    // 특정 판매자가 등록한 휴대폰 목록 조회 (테이블 형태)
-    public static List<String[]> getPhonesBySellerEmail(String sellerEmail) {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        List<String[]> phoneList = new ArrayList<>();
-
-        String sql = "SELECT p.phone_id, p.model, p.brand, p.price, p.released_at " +
-                "FROM phone p " +
-                "JOIN stock s ON p.phone_id = s.phone_id " +
-                "JOIN seller sel ON s.seller_id = sel.seller_id " +
-                "WHERE sel.email = ?";
-
-        try {
-            con = DBUtil.getConnection();
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, sellerEmail);
-            rs = pstmt.executeQuery();
-            while (rs.next()) {
-                phoneList.add(new String[]{
-                        String.valueOf(rs.getInt("phone_id")),
-                        rs.getString("model"),
-                        rs.getString("brand"),
-                        String.valueOf(rs.getInt("price")),
-                        rs.getDate("released_at").toString()
-                });
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DBUtil.releaseConnection(rs, pstmt, con);
-        }
-        return phoneList;
-    }
-
-    // 판매자의 pending 상태 주문 목록 조회 (현재 상태 포함)
-    public static List<String[]> getPendingOrdersForSeller(int sellerId) {
+    // 판매자의 주문받은 목록 조회
+    public static List<String[]> getOrdersForSeller(int sellerId) {
         Connection con = null;
         PreparedStatement pstmt = null;
         ResultSet rs = null;
@@ -231,6 +183,7 @@ public class SellerDao {
         return orderList;
     }
 
+    // 주문 상태 변경
     public static boolean updateOrderStatus(int orderId, String newStatus, String canceledReason) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -263,5 +216,4 @@ public class SellerDao {
             DBUtil.releaseConnection(pstmt, con);
         }
     }
-
 }

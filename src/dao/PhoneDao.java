@@ -7,7 +7,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class PhoneDao {
-    // 공통 SQL 실행 메서드
+
+    // 공통 SQL 실행 동적쿼리
     private static List<String[]> executePhoneQuery(String condition, Object... params) {
         Connection con = null;
         PreparedStatement pstmt = null;
@@ -26,9 +27,9 @@ public class PhoneDao {
             pstmt = con.prepareStatement(sql);
             for (int i = 0; i < params.length; i++) {
                 if (params[i] instanceof String) {
-                    pstmt.setString(i + 1, (String) params[i]); //String으로 넘어오면
+                    pstmt.setString(i + 1, (String) params[i]); //String 으로 넘어오면
                 } else {
-                    pstmt.setInt(i + 1, (int) params[i]); //int로 넘어오면
+                    pstmt.setInt(i + 1, (int) params[i]); //int 로 넘어오면
                 }
             }
             rs = pstmt.executeQuery();

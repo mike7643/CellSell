@@ -12,24 +12,39 @@ import java.util.List;
 
 public class SellerDashboard {
     public static void openSellerDashboard(int sellerId) {
+        String sellerName = SellerDao.getSellerNameById(sellerId);
+        String greetingMessage = sellerName + " 판매자님, 반갑습니다!";
+
         JFrame frame = new JFrame("판매자 대시보드");
         frame.setSize(400, 400);
-        frame.setLayout(new GridLayout(3, 1, 10, 10));
+        frame.setLayout(new BorderLayout(10, 10));
 
+        JLabel greetingLabel = new JLabel(greetingMessage, JLabel.CENTER);
+        greetingLabel.setFont(new Font("Dialog", Font.PLAIN, 20));// 폰트 적용함. 글자 크기 작아서
+
+        greetingLabel.setHorizontalAlignment(JLabel.CENTER);
+        greetingLabel.setVerticalAlignment(JLabel.CENTER);
+        frame.add(greetingLabel, BorderLayout.NORTH);
+
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 1, 10, 10));
         JButton viewMyPhonesButton = new JButton("내 휴대폰 보기");
         JButton manageOrdersButton = new JButton("주문 관리");
         JButton sellPhoneButton = new JButton("휴대폰 판매");
 
-        frame.add(viewMyPhonesButton);
-        frame.add(manageOrdersButton);
-        frame.add(sellPhoneButton);
+        buttonPanel.add(viewMyPhonesButton);
+        buttonPanel.add(manageOrdersButton);
+        buttonPanel.add(sellPhoneButton);
+
+        frame.add(buttonPanel, BorderLayout.CENTER);
 
         frame.setVisible(true);
 
         viewMyPhonesButton.addActionListener(e -> viewMyPhonesTable(sellerId));
-        manageOrdersButton.addActionListener(e -> managePendingOrders(sellerId));
+        manageOrdersButton.addActionListener(e -> manageOrders(sellerId));
         sellPhoneButton.addActionListener(e -> sellPhone(sellerId));
     }
+
+
 
     private static void sellPhone(int sellerId) {
         JFrame frame = new JFrame("휴대폰 판매");
@@ -133,8 +148,8 @@ public class SellerDashboard {
     }
 
     // 주문 관리 (주문 상태 표시 + 상태 변경)
-    private static void managePendingOrders(int sellerId) {
-        List<String[]> orders = SellerDao.getPendingOrdersForSeller(sellerId);
+    private static void manageOrders(int sellerId) {
+        List<String[]> orders = SellerDao.getOrdersForSeller(sellerId);
 
         JFrame frame = new JFrame("주문 관리");
         frame.setSize(750, 400);

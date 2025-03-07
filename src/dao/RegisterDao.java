@@ -6,30 +6,6 @@ import java.sql.*;
 
 public class RegisterDao {
 
-    // 이메일 중복 확인 (customer or seller 테이블)
-    private static boolean isEmailExists(String table, String email) {
-        Connection con = null;
-        PreparedStatement pstmt = null;
-        ResultSet rs = null;
-        boolean exists = false;
-
-        String sql = "SELECT 1 FROM " + table + " WHERE email = ?";
-        try {
-            con = DBUtil.getConnection();
-            pstmt = con.prepareStatement(sql);
-            pstmt.setString(1, email);
-            rs = pstmt.executeQuery();
-            if (rs.next()) {
-                exists = true; // 이메일이 존재하면 true 반환
-            }
-        } catch (SQLException e) {
-            e.printStackTrace();
-        } finally {
-            DBUtil.releaseConnection(rs, pstmt, con);
-        }
-        return exists;
-    }
-
     // 사용자 등록 (가입 후 생성된 ID 반환)
     public static int rgCustomer(String name, String email, String phone) {
         if (isEmailExists("customer", email)) {
@@ -96,5 +72,29 @@ public class RegisterDao {
         }
 
         return generatedId; // 생성된 ID 반환 (-1이면 실패)
+    }
+
+    // 이메일 중복 확인 (customer or seller 테이블)
+    private static boolean isEmailExists(String table, String email) {
+        Connection con = null;
+        PreparedStatement pstmt = null;
+        ResultSet rs = null;
+        boolean exists = false;
+
+        String sql = "SELECT 1 FROM " + table + " WHERE email = ?";
+        try {
+            con = DBUtil.getConnection();
+            pstmt = con.prepareStatement(sql);
+            pstmt.setString(1, email);
+            rs = pstmt.executeQuery();
+            if (rs.next()) {
+                exists = true; // 이메일이 존재하면 true
+            }
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } finally {
+            DBUtil.releaseConnection(rs, pstmt, con);
+        }
+        return exists;
     }
 }
