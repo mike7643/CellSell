@@ -109,7 +109,7 @@ public class CustomerDashboard {
         gbc.gridx = 2;
         searchPanel.add(releaseDateSearchButton, gbc);
 
-        // 가격 검색 (단일 가격 이하)
+        // 가격 검색
         gbc.gridx = 0;
         gbc.gridy++;
         searchPanel.add(new JLabel("가격 (~이하):"), gbc);
@@ -131,7 +131,7 @@ public class CustomerDashboard {
 
         browseFrame.add(searchPanel, BorderLayout.WEST);
 
-        // 검색 버튼 이벤트 추가
+
         modelSearchButton.addActionListener(e -> updatePhoneTable(PhoneDao.searchPhonesByModel(modelField.getText().trim())));
         brandSearchButton.addActionListener(e -> updatePhoneTable(PhoneDao.searchPhonesByBrand(brandField.getText().trim())));
         sellerSearchButton.addActionListener(e -> updatePhoneTable(PhoneDao.searchPhonesBySeller(sellerField.getText().trim())));

@@ -10,7 +10,7 @@ public class RegisterDao {
     public static int rgCustomer(String name, String email, String phone) {
         if (isEmailExists("customer", email)) {
             System.err.println("중복된 이메일로 가입 시도: " + email);
-            return -1; // 중복된 이메일이면 -1 반환
+            return -1;
         }
 
         Connection con = null;
@@ -44,7 +44,7 @@ public class RegisterDao {
     public static int rgSeller(String name, String email, String phone) {
         if (isEmailExists("seller", email)) {
             System.err.println("중복된 이메일로 가입 시도: " + email);
-            return -1; // 중복된 이메일이면 -1 반환
+            return -1;
         }
 
         Connection con = null;
@@ -71,7 +71,7 @@ public class RegisterDao {
             DBUtil.releaseConnection(rs, pstmt, con);
         }
 
-        return generatedId; // 생성된 ID 반환 (-1이면 실패)
+        return generatedId;
     }
 
     // 이메일 중복 확인 (customer or seller 테이블)
@@ -88,7 +88,7 @@ public class RegisterDao {
             pstmt.setString(1, email);
             rs = pstmt.executeQuery();
             if (rs.next()) {
-                exists = true; // 이메일이 존재하면 true
+                exists = true;
             }
         } catch (SQLException e) {
             e.printStackTrace();

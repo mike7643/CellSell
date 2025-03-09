@@ -29,3 +29,4 @@ bin/
 .DS_Store
 
 db/ConnectionConst.java
+/mysql-connector-j-8.0.33.jar
